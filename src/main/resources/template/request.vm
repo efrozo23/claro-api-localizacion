@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svc_init SYSTEM "Mlp_svc_init_320.dtd">
+<svc_init ver="3.2.0">
+   <hdr ver="3.2.0">
+      <client>
+         <id>$!exchange.properties.user</id>
+         <pwd>$!exchange.properties.password</pwd>
+      </client>
+   </hdr>
+   <eme_lir res_type="SYNC" ver="3.2.0">
+      <msids>
+         <msid enc="ASC" type="MSISDN">$exchange.properties.min</msid>
+      </msids>
+   </eme_lir>
+</svc_init>

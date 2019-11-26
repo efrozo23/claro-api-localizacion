@@ -1,0 +1,73 @@
+spec:
+  template:
+    spec:
+      containers:
+        - env:
+            - name: SPRING_APPLICATION_JSON
+              value: '{"server":{"undertow":{"io-threads":10, "worker-threads":20 }}}'
+            - name: JAVA_OPTIONS
+              value: '-Xms1024m -Xmx1024m -Dfile.encoding=ISO-8859-1'
+            - name: claro.connection.password
+              valueFrom:
+                secretKeyRef:
+                  key: apitrans.connection.password
+                  name: api-generic-credentials-secret
+            - name: claro.connection.username
+              valueFrom:
+                secretKeyRef:
+                  key: apitrans.connection.username
+                  name: api-generic-credentials-secret
+            - name: lbs.password
+              valueFrom:
+                secretKeyRef:
+                  key: lbs.password
+                  name: api-generic-credentials-secret
+            - name: lbs.user
+              valueFrom:
+                secretKeyRef:
+                  key: lbs.user
+                  name: api-generic-credentials-secret
+            - name: spring.activemq.password
+              valueFrom:
+                secretKeyRef:
+                  key: spring.activemq.password
+                  name: api-generic-credentials-secret
+            - name: spring.activemq.user
+              valueFrom:
+                secretKeyRef:
+                  key: spring.activemq.user
+                  name: api-generic-credentials-secret
+          envFrom:
+            - configMapRef:
+                name: broker-audit-configmap
+            - configMapRef:
+                name: api-localizacion-configmap
+            - configMapRef:
+                name: apitransbd-configmap
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+              scheme: HTTP
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 120
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+              scheme: HTTP
+            failureThreshold: 2
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 120
+          resources:
+            limits:
+              cpu: 2
+              memory: 1Gi
+            requests:
+              cpu: 2
+              memory: 1Gis
