@@ -25,6 +25,8 @@ public class LBSRoute extends RouteBuilder  {
 	public static final String AUDIT_DETAILS = "auditDetails";
 	public static final String HEADERS_ERROR = "error";
 	
+	public static final String PIC_ROUTE ="direct://pic-endpoint";
+	
 	private Logger logger = LoggerFactory.getLogger(LBSRoute.class);
 	
 
@@ -54,17 +56,22 @@ public class LBSRoute extends RouteBuilder  {
 			.endDoTry()
 			.doCatch(Exception.class)
 				.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Error en el consumo del servicio LBS || Codigo: ${headers.CamelHttpResponseCode} ")
+				// To PIC Route
+				.to(PIC_ROUTE)
 			.end()
 			.choice()
-				.when(simple("${headers.CamelHttpResponseCode} != 200 "))
-					.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Error en el consumo del servicio LBS || Codigo: ${headers.CamelHttpResponseCode} ")
-					.setProperty(AUDIT_DETAILS, simple("SERVICIO NO DISPONIBLE || STATUS CODE: ${headers.CamelHttpResponseCode}"))
-					.setHeader(HEADERS_ERROR, constant(400))
-					.throwException(NullPointerException.class, "{{message.response.otros}}")
+				.when().simple("${headers.isPIC} != true")
+					.choice()
+						.when(simple("${headers.CamelHttpResponseCode} != 200 "))
+							.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Error en el consumo del servicio LBS || Codigo: ${headers.CamelHttpResponseCode} ")
+							.setProperty(AUDIT_DETAILS, simple("SERVICIO NO DISPONIBLE || STATUS CODE: ${headers.CamelHttpResponseCode}"))
+							.setHeader(HEADERS_ERROR, constant(400))
+							.to(PIC_ROUTE)
+							//.throwException(NullPointerException.class, "{{message.response.otros}}")
+					.endChoice()
+					.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Servicio LBS OK || body : ${body}")
+					.to(LBS_COORDINATES)
 				.endChoice()
-			.end()
-			.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Servicio LBS OK || body : ${body}")
-			.to(LBS_COORDINATES)
 			.end();
 		
 		from(LBS_COORDINATES).routeId("SearchCoordinates").streamCaching()
@@ -81,17 +88,17 @@ public class LBSRoute extends RouteBuilder  {
 				.when(simple(" ${exchangeProperty.fechaUbicacion} == null || ${exchangeProperty.fechaUbicacion} == '' || ${exchangeProperty.latitud} == '' || ${exchangeProperty.longitud} == '' "))
 					.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Falta uno de los siguientes valores | fecha: ${exchangeProperty.fechaUbicacion} | latitud:${exchangeProperty.latitud} | longitud:${exchangeProperty.longitud}")
 					.setProperty(AUDIT_DETAILS, simple("Falta uno de los siguientes valores | fecha: ${exchangeProperty.fechaUbicacion} | latitud:${exchangeProperty.latitud} | longitud:${exchangeProperty.longitud}"))
-					.throwException(Exception.class, "{{message.response.error}}")
-					
+					// To PIC Route
+					.to(PIC_ROUTE)
+					//.throwException(Exception.class, "{{message.response.error}}")
 				.endChoice()
-				.otherwise()
-					.log(LoggingLevel.TRACE, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Validando diferencia de minutos : {{lbs.tiempomaximo}} | Fecha: ${exchangeProperty.fechaUbicacion}")
-					.bean(ValidatorDate.class)
 				.endChoice()
 			.end()
-			.to(TransitionRoute.ROUTE_UBICACITION)
+			.choice()
+				.when().simple("${headers.isPIC} != true")
+					.to(TransitionRoute.ROUTE_UBICACITION)
+				.end()
 			.end();
-		
 	}
 	
 	
