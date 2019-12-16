@@ -194,7 +194,7 @@
 					<include>application.properties</include>
 					<include>request.vm</include>
 					<include>velocity.properties</include>
-<!-- 					<include>log4j2.xml</include> -->
+					<include>log4j2.xml</include>
 				</includes>
 			</resource>
 			<resource>
