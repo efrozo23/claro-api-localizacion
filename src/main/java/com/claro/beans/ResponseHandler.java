@@ -1,5 +1,6 @@
 package com.claro.beans;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -13,11 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.claro.dto.PICResponse;
 import com.claro.dto.Response;
 import com.claro.dto.response.Data;
 import com.claro.dto.response.Respuesta;
 import com.claro.routes.LBSRoute;
 import com.claro.routes.TransitionRoute;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -25,7 +30,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class ResponseHandler {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	@Autowired
 	private Environment env;
 
@@ -36,7 +41,7 @@ public class ResponseHandler {
 		return new Response();
 	}
 
-	public Response buildResponseError(String codigo, String mensaje, String excepcion){
+	public Response buildResponseError(String codigo, String mensaje, String excepcion) {
 		Response dto = new Response();
 		Data data = new Data("", "", "", "");
 		Respuesta respuesta = new Respuesta();
@@ -50,11 +55,11 @@ public class ResponseHandler {
 			respuesta.setMensajeRespuesta(env.getProperty(mensaje));
 		}
 		logger.info("Mensaje Original:{} ", mensaje);
-		
-		
+
 		String defaultcharset = Charset.defaultCharset().displayName();
 		logger.info("Codificación usada:{}", defaultcharset);
-		respuesta.setMensajeRespuesta(new String(respuesta.getMensajeRespuesta().getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8));
+		respuesta.setMensajeRespuesta(new String(respuesta.getMensajeRespuesta().getBytes(StandardCharsets.ISO_8859_1),
+				StandardCharsets.UTF_8));
 		logger.info("Mensaje codificado:{} ", respuesta.getMensajeRespuesta());
 		dto.setData(data);
 		dto.setRespuesta(respuesta);
@@ -72,10 +77,42 @@ public class ResponseHandler {
 
 		Respuesta respuesta = new Respuesta();
 		Data dataResponse = new Data();
-		dataResponse.setPais(data.get("pais_out").toString());
-		dataResponse.setDpto(data.get("dpto_out").toString());
-		dataResponse.setCiudad(data.get("ciudad_out").toString());
+		dataResponse.setPais((String) data.get("pais_out"));
+		dataResponse.setDpto((String) data.get("dpto_out"));
+		dataResponse.setCiudad((String) data.get("ciudad_out"));
 		dataResponse.setFechaUbicacion(exchange.getProperty(LBSRoute.FECHA_UBICACION, String.class));
+		respuesta.setCodigoRespuesta(codigoRespuesta);
+		respuesta.setMensajeRespuesta(mensajeRespuesta);
+		dto.setData(dataResponse);
+		dto.setRespuesta(respuesta);
+		return dto;
+	}
+	
+	public Response buildPicResponse(Exchange exchange) {
+		ObjectMapper mapper = new ObjectMapper();
+		PICResponse pic = new PICResponse();
+		try {
+			pic = mapper.readValue(exchange.getIn().getBody(String.class), PICResponse.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String codigoRespuesta = (String) exchange.getProperty("codigoRespuesta");
+		String mensajeRespuesta = (String) exchange.getProperty("mensajeRespuesta");
+		Response dto = new Response();
+
+		Respuesta respuesta = new Respuesta();
+		Data dataResponse = new Data();
+		dataResponse.setCiudad("");
+		dataResponse.setDpto("");
+		dataResponse.setPais(pic.getRoamingLocation().getCountry());
+		dataResponse.setFechaUbicacion(pic.getRoamingLocation().getTimestamp());
 		respuesta.setCodigoRespuesta(codigoRespuesta);
 		respuesta.setMensajeRespuesta(mensajeRespuesta);
 		dto.setData(dataResponse);

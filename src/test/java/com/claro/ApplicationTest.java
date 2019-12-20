@@ -37,7 +37,7 @@ import com.claro.dto.Request;
 public class ApplicationTest {
 
     private Request request;
-    private final static String URL = "http://localhost:8088/localizacion/geoposicion/v1";
+    private final static String URL = "http://localhost:8081/localizacion/geoposicion/v1";
     
     private Logger log = LoggerFactory.getLogger(ApplicationTest.class);
 
