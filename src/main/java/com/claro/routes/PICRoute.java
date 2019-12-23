@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.claro.beans.ResponseHandler;
-import com.claro.beans.ValidatorDate;
 
 @Component
 public class PICRoute extends RouteBuilder {
@@ -20,16 +19,17 @@ public class PICRoute extends RouteBuilder {
 	public static final String HEADERS_ERROR = "error";
 	public static final String RESPONSE = "response";
 	public static final String AUDIT_ROUTE = "direct://adutoria";
-
+	public static final String MSG_PIC_RESPONSE = "msgPicResponse";
+	
 	@Override
 	public void configure() throws Exception {
 		
 
-		from(PIC_ROUTE).routeId("PIC-SERVICE")
+		from(PIC_ROUTE).routeId("PIC-SERVICE").streamCaching("true")
 		.onException(Exception.class)
 	     	.handled(true)
 	     	.log(LoggingLevel.ERROR, log, "Ingreso por error: ${body}")
-	        .log(LoggingLevel.ERROR, log, "Message: ${exception.message} ${exception.cause}")
+	        .log(LoggingLevel.ERROR, log, "Message: ${exception.message} | Causa: ${exception.cause}")
 	        .setProperty("exception", simple("message.response.error"))
 	        .setProperty(LBSRoute.AUDIT_DETAILS, simple("${exception.message} || STATUS CODE: ${headers.CamelHttpResponseCode}"))
 	        .choice()
@@ -55,6 +55,8 @@ public class PICRoute extends RouteBuilder {
 			.doTry()
 				.to("http4:PICWS")
 				//.setBody(constant("{\"roamingLocation\":{\"timestamp\":\"2019-11-19T00:00:00\",\"msisdn\":573228888376,\"vlrgt\":\"[TBA]\",\"country\":\"Colombia\"} }"))
+				.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || Respuesta PIC : message: ${body} ")
+				.setProperty("body").body(String.class)
 				.setHeader("CamelHttpResponseCode", constant(200))
 			.endDoTry()
 			.doCatch(Exception.class)
@@ -70,31 +72,36 @@ public class PICRoute extends RouteBuilder {
 					.throwException(NullPointerException.class, "{{message.response.otros}}")
 				.endChoice()
 				.end()
+				.setBody(exchangeProperty("body"))
+				.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || Respuesta PIC : message: ${body} ")
 				.choice()
-					.when().jsonpath("$.[?(@.error)]")
+					.when().jsonpath("$.error.code")
+						.setHeader("errorCode").jsonpath("$.error.code",Long.class)
+						.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Encontro un error: ${headers.errorCode}")
 						.choice()
-							.when().jsonpath("$.error[?(@.code == 9000)]")
-								.log("Error 9000")
-								.setHeader("msgPicResponse", constant("message.response.pic.9000"))
-							.when().jsonpath("$.error[?(@.code == 9001)]")
+							.when(simple(" ${headers.errorCode} == 9000 "))
+								.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Ingreso en el primer choice")
+								.setHeader(MSG_PIC_RESPONSE, constant("message.response.pic.9000"))
+							.when(simple("${headers.errorCode} == 9001"))
 								.log("Error 9001")
-								.setHeader("msgPicResponse", constant("message.response.pic.9001"))
-							.when().jsonpath("$.error[?(@.code == 9002)]")
+								.setHeader(MSG_PIC_RESPONSE, constant("message.response.pic.9001"))
+							.when(simple("${headers.errorCode} == 9001"))	
 								.log("Error 9002")
-								.setHeader("msgPicResponse", constant("message.response.pic.9002"))
-							.when().jsonpath("$.error[?(@.code == 9003)]")
+								.setHeader(MSG_PIC_RESPONSE, constant("message.response.pic.9002"))
+							.when(simple("${headers.errorCode} == 9003"))
 								.log("Error 9003")
-								.setHeader("msgPicResponse", constant("message.response.pic.9003"))
-							.when().jsonpath("$.error[?(@.code == 9004)]")
+								.setHeader(MSG_PIC_RESPONSE, constant("message.response.pic.9003"))
+							.when(simple("${headers.errorCode} == 9004"))
 								.log("Error 9004")
-								.setHeader("msgPicResponse", constant("message.response.pic.9004"))
-							.when().jsonpath("$.error[?(@.code == 9005)]")
+								.setHeader(MSG_PIC_RESPONSE, constant("message.response.pic.9004"))
+							.when(simple("${headers.errorCode} == 9005"))
 								.log("Error 9005")
-								.setHeader("msgPicResponse", constant("message.response.pic.9005"))
+								.setHeader(MSG_PIC_RESPONSE, constant("message.response.pic.9005"))
 							.endChoice()
 						.bean(ResponseHandler.class, "buildResponseError({{message.response.success.ok}}, ${headers.msgPicResponse}, ${property.exception})")
 						.setProperty(RESPONSE, body())
 						.setHeader("isPIC", constant(true))
+						.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Finalizo control de error: ${body}:")
 					.otherwise()
 						.setProperty("codigoRespuesta", simple("{{message.response.success.ok}}"))
 						.setProperty("mensajeRespuesta", simple("{{message.response.success.message}}"))

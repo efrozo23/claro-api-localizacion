@@ -45,7 +45,7 @@ public class ApplicationTest {
     public void iniciar() {
         request = new Request();
         DataRequest data = new DataRequest();
-        data.setNumeroCelular("3103144478ww");
+        data.setNumeroCelular("3023253439");
         request.setData(data);
     }
 
