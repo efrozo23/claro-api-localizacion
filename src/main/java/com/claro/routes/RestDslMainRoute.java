@@ -80,12 +80,12 @@ public class RestDslMainRoute extends RouteBuilder {
            .outType(Response.class) 
            .to("direct:from-api");
         
-        rest(env.getProperty("endpoint.api.get")).description(env.getProperty("endpoint.api.get.description"))
-//        	.securityDefinitions().end()
-        	
+        rest()
         	.consumes(MediaType.APPLICATION_JSON)
         	.produces(MediaType.APPLICATION_JSON)
-        .get().type(String.class).outType(String.class).to("direct://get");
+        .get(env.getProperty("endpoint.api.get")).description(env.getProperty("endpoint.api.get.description"))
+        .type(String.class).outType(String.class).to("direct://get")
+        .get(env.getProperty("endpoint.api.geographicLocation")).type(String.class).outType(String.class).to("mock:ok");
         
         onException(Exception.class)
         .handled(true)
@@ -147,14 +147,7 @@ public class RestDslMainRoute extends RouteBuilder {
          .setProperty(REQUEST, body())
          .marshal().json(JsonLibrary.Jackson)        
          .setProperty("min").jsonpath("$.data.numeroCelular")
-//         .process(exchange ->{
-//         		Request request = exchange.getIn().getBody(Request.class);
-//         		exchange.setProperty(DATA_PROPERTY, request.getData());
-//         })
-//         .split(simple("${exchangeProperty.dataR}"))
-//         	.log(LoggingLevel.DEBUG, log, "Exchange= ${exchangeProperty.procesoId} || mensaje= Número a validar || body = ${body}")
-//         	.log(LoggingLevel.DEBUG, log, "Exchange= ${exchangeProperty.procesoId} || mensaje= Finalizo validación por número || body = ${body}")
-//         .end()
+
          .log(LoggingLevel.DEBUG, log, "Exchange= ${exchangeProperty.procesoId} || mensaje= Valido el request || Request: ${body}")
          .removeHeaders("*")
          .log(LoggingLevel.DEBUG, log, "Exchange= ${exchangeProperty.procesoId} || mensaje= Procede a consultar LBS || Detalle = Número min: ${exchangeProperty.min}")

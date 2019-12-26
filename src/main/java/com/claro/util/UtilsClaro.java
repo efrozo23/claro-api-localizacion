@@ -13,7 +13,7 @@ public class UtilsClaro {
 		String month = date.substring(4, 6);
 		String dayMonth = date.substring(6, 8);
 		String hour = date.substring(8, 10) + ":" + date.subSequence(10, 12) + ":" + date.substring(12, 14);
-		return year + "-" + month + "-" + dayMonth + "T" + hour;
+		return year + "-" + month + "-" + dayMonth + " " + hour;
 	}
 
 	public static final boolean startNumberValid(String min) {

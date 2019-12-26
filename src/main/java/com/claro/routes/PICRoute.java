@@ -75,7 +75,7 @@ public class PICRoute extends RouteBuilder {
 				.setBody(exchangeProperty("body"))
 				.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || Respuesta PIC : message: ${body} ")
 				.choice()
-					.when().jsonpath("$.error.code")
+					.when().jsonpath("$[?(@.error)]")
 						.setHeader("errorCode").jsonpath("$.error.code",Long.class)
 						.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Encontro un error: ${headers.errorCode}")
 						.choice()

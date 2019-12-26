@@ -20,6 +20,7 @@ import com.claro.dto.response.Data;
 import com.claro.dto.response.Respuesta;
 import com.claro.routes.LBSRoute;
 import com.claro.routes.TransitionRoute;
+import com.claro.util.UtilsClaro;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,7 +81,7 @@ public class ResponseHandler {
 		dataResponse.setPais((String) data.get("pais_out"));
 		dataResponse.setDpto((String) data.get("dpto_out"));
 		dataResponse.setCiudad((String) data.get("ciudad_out"));
-		dataResponse.setFechaUbicacion(exchange.getProperty(LBSRoute.FECHA_UBICACION, String.class));
+		dataResponse.setFechaUbicacion(UtilsClaro.formatDate(exchange.getProperty(LBSRoute.FECHA_UBICACION, String.class)));
 		respuesta.setCodigoRespuesta(codigoRespuesta);
 		respuesta.setMensajeRespuesta(mensajeRespuesta);
 		dto.setData(dataResponse);
