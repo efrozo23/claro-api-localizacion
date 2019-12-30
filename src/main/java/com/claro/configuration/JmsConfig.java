@@ -54,6 +54,11 @@ public class JmsConfig {
 		audit.setIdCliente(exchange.getProperty(RestDslMainRoute.ID_CLIENTE, String.class)==null?" ":exchange.getProperty(RestDslMainRoute.ID_CLIENTE, String.class));
 		audit.setLatitudLbs(exchange.getProperty(LBSRoute.LATITUD_LBS, String.class));
 		audit.setLongitudLbs(exchange.getProperty(LBSRoute.LONGITUD_LBS, String.class));
+		audit.setRequestLBS(exchange.getProperty("SOLICITUD", String.class));
+		audit.setResponseLBS(exchange.getProperty("RESPUESTA", String.class));
+		audit.setStatusLBS(exchange.getProperty("STATUS", String.class));
+		audit.setResponsePIC(exchange.getProperty("body", String.class));
+		audit.setStatusPIC(exchange.getProperty("ESTADOPIC", String.class));
 		return audit;
 	}
 

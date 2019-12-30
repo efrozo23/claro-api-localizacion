@@ -19,9 +19,16 @@ public class UtilsClaro {
 	public static final boolean startNumberValid(String min) {
 
 		return min.startsWith(START_NUMBER);
+		
 	}
 	
-	
+	public static final String convertBody(String  body) {
+		System.out.println(body);
+		body = body.replaceAll("\"", "\\\"");
+		System.out.println(body);
+		return body;
+		
+	}
 	
 	
 }

@@ -57,7 +57,9 @@ public class PICRoute extends RouteBuilder {
 				//.setBody(constant("{\"roamingLocation\":{\"timestamp\":\"2019-11-19T00:00:00\",\"msisdn\":573228888376,\"vlrgt\":\"[TBA]\",\"country\":\"Colombia\"} }"))
 				.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || Respuesta PIC : message: ${body} ")
 				.setProperty("body").body(String.class)
+				.setProperty("ESTADOPIC", header(Exchange.HTTP_RESPONSE_CODE))
 				.setHeader("CamelHttpResponseCode", constant(200))
+				
 			.endDoTry()
 			.doCatch(Exception.class)
 				.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Error en el consumo del servicio PIC || Codigo: ${headers.CamelHttpResponseCode} ")
