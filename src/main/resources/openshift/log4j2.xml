@@ -9,15 +9,16 @@
 		<Console name="ConsoleAppender" target="SYSTEM_OUT">
 			<PatternLayout pattern="${LOG_PATTERN}" />
 		</Console>
-		<JDBC name="databaseAppender" tableName="LOGS">
+		<JDBC name="databaseAppender" tableName="API_MNG.LOGS">
 			<ConnectionFactory
 				class="com.claro.configuration.JdbcConnectionLogs"
 				method="getConn" />
-			<Column name="APPLICATION" literal="APPLICATION_SEQUENCE.NEXTVAL"></Column>
+			<Column name="APPLICATION" literal="API_MNG.APPLICATION_SEQUENCE.NEXTVAL"></Column>
 			<Column name="LOG_LEVEL" pattern="%level" />
 			<Column name="LOGGER" pattern="%logger"></Column>
 			<Column name="MESSAGE" pattern="%message" />
 			<Column name="LOG_DATE" pattern="%d{yyyy-MM-dd HH:mm:ss}" />
+			<Column name="API_NAME" literal="'LOCALIZACION'" />
 		</JDBC>
 		<Async name="Async" bufferSize="262144">
 			
