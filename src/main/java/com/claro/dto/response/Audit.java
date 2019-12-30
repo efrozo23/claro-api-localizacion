@@ -57,6 +57,22 @@ public class Audit implements Serializable {
 	private Request request;
 	
 	private Response response;
+	
+	@JsonProperty
+	private String statusLBS;
+	
+	@JsonProperty
+	private String requestLBS;
+	
+	
+	@JsonProperty
+	private String responseLBS;
+	
+	@JsonProperty
+	private String statusPIC;
+	
+	@JsonProperty
+	private String responsePIC;
 
 	public String getApi() {
 		return api;
@@ -72,6 +88,46 @@ public class Audit implements Serializable {
 
 	public void setFechaTransaccion(String fechaTransaccion) {
 		this.fechaTransaccion = fechaTransaccion;
+	}
+
+	public String getStatusLBS() {
+		return statusLBS;
+	}
+
+	public void setStatusLBS(String statusLBS) {
+		this.statusLBS = statusLBS;
+	}
+
+	public String getRequestLBS() {
+		return requestLBS;
+	}
+
+	public void setRequestLBS(String requestLBS) {
+		this.requestLBS = requestLBS;
+	}
+
+	public String getResponseLBS() {
+		return responseLBS;
+	}
+
+	public void setResponseLBS(String responseLBS) {
+		this.responseLBS = responseLBS;
+	}
+
+	public String getStatusPIC() {
+		return statusPIC;
+	}
+
+	public void setStatusPIC(String statusPIC) {
+		this.statusPIC = statusPIC;
+	}
+
+	public String getResponsePIC() {
+		return responsePIC;
+	}
+
+	public void setResponsePIC(String responsePIC) {
+		this.responsePIC = responsePIC;
 	}
 
 	public Request getRequest() {

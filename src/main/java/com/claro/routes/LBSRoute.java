@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.claro.util.UtilsClaro;
+
 @Component
 public class LBSRoute extends RouteBuilder  {
 
@@ -42,6 +44,8 @@ public class LBSRoute extends RouteBuilder  {
 
 			.setHeader("CamelVelocityResourceUri").simple("{{lbs.template}}")
 			.to("velocity:dummy?contentCache=true&propertiesFile=velocity.properties")
+			.setProperty("SOLICITUD", bodyAs(String.class))
+			.setProperty("SOLICITUD").method(UtilsClaro.class, "convertBody(${exchangeProperty.SOLICITUD})")
 			.log(LoggingLevel.DEBUG, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Plantilla cargada || destalle: ${body}")
 			.removeHeaders("*")
 			.convertBodyTo(String.class)
@@ -51,6 +55,8 @@ public class LBSRoute extends RouteBuilder  {
 			.setHeader(Exchange.HTTP_URI, simple("{{lbs.url}}"))
 			.doTry()
 				.to("http4://dummy?httpClient.connectTimeout={{lbs.connection.timeout}}&httpClient.socketTimeout={{lbs.connection.timeout}}&throwExceptionOnFailure=false")
+				.setProperty("STATUS", header(Exchange.HTTP_RESPONSE_CODE))
+				.setProperty("RESPUESTA", bodyAs(String.class))
 			.endDoTry()
 			.doCatch(Exception.class)
 				.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Error en el consumo del servicio LBS || Codigo: ${headers.CamelHttpResponseCode} ")

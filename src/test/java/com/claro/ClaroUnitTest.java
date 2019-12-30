@@ -29,6 +29,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.claro.routes.LBSRoute;
 import com.claro.util.ConvertUtils;
+import com.claro.util.UtilsClaro;
+import com.jayway.jsonpath.internal.Utils;
 
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest
@@ -170,6 +172,9 @@ public class ClaroUnitTest extends CamelTestSupport {
 	@Test
 	public void validateProperties() {
 		
+		String prueba = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE svc_init SYSTEM \"MLP_SVC_INIT_320.DTD\\\"><svc_init ver=\"3.2.0\"><hdr ver=\"3.2.0\"><client><id>TEST_CLIENT1</id><pwd>tactical123!</pwd></client></hdr><slir ver=\"3.2.0\" res_type=\"SYNC\"><msids><msid enc=\"ASC\" type=\"MSISDN\">573023253439</msid></msids></slir></svc_init>";
+		String resultado = UtilsClaro.convertBody(prueba);
+		log.info(resultado);
 	}
 
 }

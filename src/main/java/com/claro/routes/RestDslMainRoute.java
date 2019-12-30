@@ -85,7 +85,7 @@ public class RestDslMainRoute extends RouteBuilder {
         	.produces(MediaType.APPLICATION_JSON)
         .get(env.getProperty("endpoint.api.get")).description(env.getProperty("endpoint.api.get.description"))
         .type(String.class).outType(String.class).to("direct://get")
-        .get(env.getProperty("endpoint.api.geographicLocation")).type(String.class).outType(String.class).to("mock:ok");
+        .get(env.getProperty("endpoint.api.geographicLocation")).type(String.class).outType(String.class).to(MockEndpoints.MOCKROUTE);
         
         onException(Exception.class)
         .handled(true)
