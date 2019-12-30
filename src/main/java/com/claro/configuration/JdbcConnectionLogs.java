@@ -27,6 +27,11 @@ public class JdbcConnectionLogs {
 		properties.setProperty("password", "xDR5TGB*");
 		ConnectionFactory cf = new DriverManagerConnectionFactory("jdbc:oracle:thin:@172.24.43.93:1711/APITRANS",
 				properties);
+//		Properties properties = new Properties();
+//		properties.setProperty("user", "API_MNG");
+//		properties.setProperty("password", "Colombia_20_19");
+//		ConnectionFactory cf = new DriverManagerConnectionFactory("jdbc:oracle:thin:@172.24.42.20:1725/DEV_APITRAN",
+//				properties);
 		PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(cf, null);
 		poolableConnectionFactory.setValidationQuery("select 1");
 
