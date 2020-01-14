@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.claro.beans.ValidatorDate;
 import com.claro.util.UtilsClaro;
 
 @Component
@@ -96,6 +97,9 @@ public class LBSRoute extends RouteBuilder  {
 					.to(PIC_ROUTE)
 					//.throwException(Exception.class, "{{message.response.error}}")
 				.endChoice()
+				.when().method(ValidatorDate.class)
+					.log(LoggingLevel.ERROR, logger, "Exchange= ${exchangeProperty.procesoId} || mensage = Fecha Ubicación mayor a:{{lbs.tiempomaximo}}")
+					.to(PIC_ROUTE)
 				.endChoice()
 			.end()
 			.choice()

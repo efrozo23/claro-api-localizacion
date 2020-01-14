@@ -151,13 +151,6 @@ public class RestDslMainRoute extends RouteBuilder {
          .log(LoggingLevel.DEBUG, log, "Exchange= ${exchangeProperty.procesoId} || mensaje= Valido el request || Request: ${body}")
          .removeHeaders("*")
          .log(LoggingLevel.DEBUG, log, "Exchange= ${exchangeProperty.procesoId} || mensaje= Procede a consultar LBS || Detalle = Número min: ${exchangeProperty.min}")
-         
-         .choice()
-         	.when(simple("${exchangeProperty.min.startsWith('{{lbs.start.number}}')} == false"))
-         		.log(LoggingLevel.ERROR, log, "Exchange= ${exchangeProperty.procesoId} || mensaje= El número no comienza con 3 || Detalle = Número min:${exchangeProperty.min} ")
-         		.throwException(Exception.class, "El número no inicia en : {{lbs.start.number}}")
-         	.endChoice()
-         .end()
          .to(LBSRoute.LBS_ROUTE)
          .setProperty("codigoRespuesta", simple("{{message.response.success.ok}}"))
          .setProperty("mensajeRespuesta", simple("{{message.response.success.message}}"))

@@ -17,7 +17,10 @@ public class DataRequest {
     @JsonProperty
     @ApiModelProperty(dataType = "Integer")
     @Size(min = 10, max = 10, message = "celular.size")    
-    @Pattern(regexp = "^[0-9]*$", message = "celular.caracteres.especiales")
+    @Pattern.List({
+		@Pattern(regexp = "^[0-9]*$", message = "celular.caracteres.especiales"),
+		@Pattern(regexp = "^3.*$", message = "celular.start")
+	})
     private String numeroCelular;
     @JsonProperty
     @ApiModelProperty(dataType = "String")

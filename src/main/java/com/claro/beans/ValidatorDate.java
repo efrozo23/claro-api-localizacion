@@ -29,11 +29,11 @@ public class ValidatorDate {
 	private Logger logger = LoggerFactory.getLogger(ValidatorDate.class);
 
 	@Handler
-	public void differenceMinutes(Exchange exchange) {
+	public boolean differenceMinutes(Exchange exchange) {
 		Instant timeStamp= Instant.now();
 		ZonedDateTime laZone= timeStamp.atZone(ZoneId.of("America/Bogota"));
 		LocalDateTime dateNow = laZone.toLocalDateTime();
-		String dateU = UtilsClaro.formatDate(exchange.getProperty(LBSRoute.FECHA_UBICACION, String.class));
+		String dateU = UtilsClaro.formatDateT(exchange.getProperty(LBSRoute.FECHA_UBICACION, String.class));
 
 		LocalDateTime localDateU = LocalDateTime.parse(dateU);
 
@@ -46,12 +46,8 @@ public class ValidatorDate {
 		
 		dateU = dateU.replace("T", " ");
 		exchange.setProperty(LBSRoute.FECHA_UBICACION, dateU);
-
-		if (minutesDff > this.minutes) {
-			logger.error("Diferencia de minutos superada: {}", minutesDff);
-			exchange.setProperty(LBSRoute.AUDIT_DETAILS, "Diferencia de minutos " + this.minutes);
-			throw new NullPointerException(message);
-		}
+		
+		return minutesDff > this.minutes;
 
 	}
 	

@@ -15,6 +15,14 @@ public class UtilsClaro {
 		String hour = date.substring(8, 10) + ":" + date.subSequence(10, 12) + ":" + date.substring(12, 14);
 		return year + "-" + month + "-" + dayMonth + " " + hour;
 	}
+	
+	public static final String formatDateT(String date) {
+		String year = date.substring(0, 4);
+		String month = date.substring(4, 6);
+		String dayMonth = date.substring(6, 8);
+		String hour = date.substring(8, 10) + ":" + date.subSequence(10, 12) + ":" + date.substring(12, 14);
+		return year + "-" + month + "-" + dayMonth + "T" + hour;
+	}
 
 	public static final boolean startNumberValid(String min) {
 
