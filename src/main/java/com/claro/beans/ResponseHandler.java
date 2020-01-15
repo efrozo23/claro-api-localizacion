@@ -1,13 +1,11 @@
 package com.claro.beans;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +19,6 @@ import com.claro.dto.response.Respuesta;
 import com.claro.routes.LBSRoute;
 import com.claro.routes.TransitionRoute;
 import com.claro.util.UtilsClaro;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -81,29 +77,19 @@ public class ResponseHandler {
 		dataResponse.setPais((String) data.get("pais_out"));
 		dataResponse.setDpto((String) data.get("dpto_out"));
 		dataResponse.setCiudad((String) data.get("ciudad_out"));
-		dataResponse.setFechaUbicacion(UtilsClaro.formatDate(exchange.getProperty(LBSRoute.FECHA_UBICACION, String.class)));
+		dataResponse.setFechaUbicacion(exchange.getProperty(LBSRoute.FECHA_UBICACION, String.class));
 		respuesta.setCodigoRespuesta(codigoRespuesta);
 		respuesta.setMensajeRespuesta(mensajeRespuesta);
 		dto.setData(dataResponse);
 		dto.setRespuesta(respuesta);
 		return dto;
 	}
-	
-	public Response buildPicResponse(Exchange exchange) {
+
+	public Response buildPicResponse(Exchange exchange) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
-		PICResponse pic = new PICResponse();
-		try {
-			pic = mapper.readValue(exchange.getIn().getBody(String.class), PICResponse.class);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		PICResponse pic  = mapper.readValue(exchange.getIn().getBody(String.class), PICResponse.class);
+
 		String codigoRespuesta = (String) exchange.getProperty("codigoRespuesta");
 		String mensajeRespuesta = (String) exchange.getProperty("mensajeRespuesta");
 		Response dto = new Response();
@@ -113,7 +99,7 @@ public class ResponseHandler {
 		dataResponse.setCiudad("");
 		dataResponse.setDpto("");
 		dataResponse.setPais(pic.getRoamingLocation().getCountry());
-		dataResponse.setFechaUbicacion(pic.getRoamingLocation().getTimestamp());
+		dataResponse.setFechaUbicacion(UtilsClaro.reverseFormat(pic.getRoamingLocation().getTimestamp()));
 		respuesta.setCodigoRespuesta(codigoRespuesta);
 		respuesta.setMensajeRespuesta(mensajeRespuesta);
 		dto.setData(dataResponse);

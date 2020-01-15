@@ -45,6 +45,7 @@ public class ValidatorDate {
 		logger.info("Diferencia de minutos: {}", minutesDff);
 		
 		dateU = dateU.replace("T", " ");
+		logger.info("Fecha para DB: {}", dateU);
 		exchange.setProperty(LBSRoute.FECHA_UBICACION, dateU);
 		
 		return minutesDff > this.minutes;
